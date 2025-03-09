@@ -1,0 +1,300 @@
+Exercise 1 - Extracting data using 'cut' command
+
+The filter command cut helps us extract selected characters or fields from a line of text.
+
+    Extracting characters.
+
+The command below shows how to extract the first four characters.
+
+    1
+
+    echo "database" | cut -c1-4
+
+You should get the string ‘data’ as output.
+
+The command below shows how to extract 5th to 8th characters.
+
+    1
+
+    echo "database" | cut -c5-8
+
+You should get the string ‘base’ as output.
+
+Non-contiguous characters can be extracted using the comma.
+
+The command below shows how to extract the 1st and 5th characters.
+
+    1
+
+    echo "database" | cut -c1,5
+
+You get the output : ‘db’
+
+    Extracting fields/columns
+
+We can extract a specific column/field from a delimited text file, by mentioning
+
+    the delimiter using the -d option, or
+    the field number using the -f option.
+
+The /etc/passwd is a “:” delimited file.
+
+The command below extracts usernames (the first field) from /etc/passwd.
+
+    1
+
+    cut -d":" -f1 /etc/passwd
+
+The command below extracts multiple fields 1st, 3rd, and 6th (username, userid, and home directory) from /etc/passwd.
+
+    1
+
+    cut -d":" -f1,3,6 /etc/passwd
+
+The command below extracts a range of fields 3rd to 6th (userid, groupid, user description and home directory) from /etc/passwd.
+
+    1
+
+    cut -d":" -f3-6 /etc/passwd
+
+Exercise 2 - Transforming data using 'tr'
+
+tr is a filter command used to translate, squeeze, and/or delete characters.
+
+    Translate from one character set to another
+
+The command below translates all lower case alphabets to upper case.
+
+    1
+
+    echo "Shell Scripting" | tr "[a-z]" "[A-Z]"
+
+You could also use the pre-defined character sets also for this purpose:
+
+    1
+
+    echo "Shell Scripting" | tr "[:lower:]" "[:upper:]"
+
+The command below translates all upper case alphabets to lower case.
+
+    1
+
+    echo "Shell Scripting" | tr  "[A-Z]" "[a-z]"
+
+    Squeeze repeating occurrences of characters
+
+The -s option replaces a sequence of a repeated characters with a single occurrence of that character.
+
+The command below replaces repeat occurrences of ‘space’ in the output of ps command with one ‘space’.
+
+    1
+
+    ps | tr -s " "
+
+In the above example, the space character within quotes can be replaced with the following : "[\:space\:]".
+
+    Delete characters
+
+We can delete specified characters using the -d option.
+
+The command below deletes all digits.
+
+    1
+
+    echo "My login pin is 5634" | tr -d "[:digit:]"
+
+The output will be : ‘My login pin is’
+
+Exercise 4 - Create a table
+
+In this exercise we will create a table called users in the PostgreSQL database using PostgresSQL CLI. This table will hold the user account information.
+
+The table users will have the following columns:
+
+    uname
+
+    uid
+
+    home
+
+    You will connect to template1 database which is already available by default. To connect to this database, run the following command at the ‘postgres=#’ prompt.
+
+    1
+
+    \c template1
+
+You will get the following message.
+
+You are now connected to database "template1" as user "postgres".
+
+Also, your prompt will change to ‘template1=#’.
+
+    Run the following statement at the ‘template1=#’ prompt to create the table.
+
+    1
+
+    create table users(username varchar(50),userid int,homedirectory varchar(100));
+
+If the table is created successfully, you will get the message below.
+
+CREATE TABLE
+
+Exercise 5 - Loading data into a PostgreSQL table.
+
+In this exercise, you will create a shell script which does the following.
+
+    Extract the user name, user id, and home directory path of each user account defined in the /etc/passwd file.
+    Save the data into a comma separated (CSV) format.
+    Load the data in the csv file into a table in PostgreSQL database.
+
+    Open a new Terminal.
+
+new_terminal.png
+
+    In the terminal, run the following command to create a new shell script named csv2db.sh.
+
+    1
+
+    touch csv2db.sh
+
+    Open the file in the editor. Copy and paste the following lines into the newly created file.
+
+    1
+    2
+    3
+    4
+    5
+    6
+    7
+    8
+
+    # This script
+    # Extracts data from /etc/passwd file into a CSV file.
+    # The csv data file contains the user name, user id and
+    # home directory of each user account defined in /etc/passwd
+    # Transforms the text delimiter from ":" to ",".
+    # Loads the data from the CSV file into a table in PostgreSQL database.
+
+    Save the file by presseing Ctrl+s or by using the File->Save menu option.
+
+    You need to add lines of code to the script that will xtract user name (field 1), user id (field 3), and home directory path (field 6) from /etc/passwd file using the cut command.
+
+Copy the following lines and paste them to the end of the script and save the file.
+
+    1
+    2
+    3
+    4
+    5
+    6
+    7
+    8
+
+    # Extract phase
+    echo "Extracting data"
+    # Extract the columns 1 (user name), 2 (user id) and 
+    # 6 (home directory path) from /etc/passwd
+    cut -d":" -f1,3,6 /etc/passwd
+
+    Run the script.
+
+    1
+
+    bash csv2db.sh
+
+    Verify that the output contains the three fields, that you extracted.
+
+    Change the script to redirect the extracted data into a file named extracted-data.txt
+
+Replace the cut command at end of the script with the following command.
+
+    1
+
+    cut -d":" -f1,3,6 /etc/passwd > extracted-data.txt
+
+    Run the script.
+
+    1
+
+    bash csv2db.sh
+
+    Run the command below to verify that the file extracted-data.txt is created, and has the content.
+
+    1
+
+    cat extracted-data.txt
+
+    The extracted columns are separated by the original “:” delimiter. You need to convert this into a “,” delimited file. Add the below lines at the end of the script and save the file.
+
+    1
+    2
+    3
+    4
+    5
+
+    # Transform phase
+    echo "Transforming data"
+    # read the extracted data and replace the colons with commas.
+    tr ":" "," < extracted-data.txt  > transformed-data.csv
+
+    Run the script.
+
+    1
+
+    bash csv2db.sh
+
+    Run the command below to verify that the file transformed-data.csv is created, and has the content.
+
+    1
+
+    cat transformed-data.csv
+
+    To load data from a shell script, you will use the psql client utility in a non-interactive manner. This is done by sending the database commands through a command pipeline to psql with the help of echo command.
+
+PostgreSQL command to copy data from a CSV file to a table is COPY.
+
+The basic structure of the command which we will use in our script is,
+
+COPY table_name FROM 'filename' DELIMITERS 'delimiter_character' FORMAT;
+
+Now, add the lines below to the end of the script ‘csv2db.sh’ and save the file.
+
+    1
+    2
+    3
+    4
+    5
+    6
+    7
+    8
+
+    # Load phase
+    echo "Loading data"
+    # Set the PostgreSQL password environment variable.
+    # Replace <yourpassword> with your actual PostgreSQL password.
+    export PGPASSWORD=<yourpassword>;
+    # Send the instructions to connect to 'template1' and
+    # copy the file to the table 'users' through command pipeline.
+    echo "\c template1;\COPY users  FROM '/home/project/transformed-data.csv' DELIMITERS ',' CSV;" | psql --username=postgres --host=postgres
+
+    Exercise 6 - Execute the final script
+
+    Run the script.
+
+    1
+
+    bash csv2db.sh
+
+    Now, add the line below to the end of the script 'csv2db.sh' and save the file.
+
+    1
+
+    echo "SELECT * FROM users;" | psql --username=postgres --host=postgres template1
+
+    Run the script to verify that the table users is populated with the data.
+
+    1
+
+    bash csv2db.sh
+
+Congratulations! You have created an ETL script using shell scripting.

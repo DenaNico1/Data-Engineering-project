@@ -1,0 +1,23 @@
+wget https://downloads.apache.org/kafka/3.8.0/kafka_2.13-3.8.0.tgz
+
+# Extract Kafka from the zip file by running the command below.
+tar -xzf kafka_2.13-3.8.0.tgz
+
+#
+cd kafka_2.13-3.8.0
+# Generate a Cluster UUID that will uniquely identify the Kafka cluster.
+KAFKA_CLUSTER_ID="$(bin/kafka-storage.sh random-uuid)"
+
+This cluster ID will be used by the KRaft controller.
+
+    KRaft requires the log directories to be configured. Run the following command to configure the log directories passing the cluster ID.
+
+    1
+
+    bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID -c config/kraft/server.properties
+
+    Now that KRaft is configured, you can start the Kafka server by running the following command.
+
+    1
+
+    bin/kafka-server-start.sh config/kraft/server.properties
